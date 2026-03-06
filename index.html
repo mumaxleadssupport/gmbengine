@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuMax Leads Engine &mdash; Premium GMB Scraper</title>
+    <!-- Google Fonts: Outfit & Inter for premium modern feel -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --surface-card: rgba(24, 24, 27, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --accent-gradient: linear-gradient(135deg, #FF6B6B, #9b51e0, #4a90e2);
+            --accent-glow: rgba(155, 81, 224, 0.4);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(155, 81, 224, 0.1), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(74, 144, 226, 0.1), transparent 25%);
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Header */
+        header {
+            padding: 24px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--surface-border);
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .export-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .export-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .export-btn.primary {
+            background: var(--accent-gradient);
+            border: none;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            font-weight: 600;
+        }
+
+        /* Main App Container */
+        .container {
+            max-width: 1300px;
+            margin: 60px auto;
+            padding: 0 24px;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 56px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--surface-card);
+            border: 1px solid var(--surface-border);
+            border-radius: 20px;
+            padding: 32px;
+            backdrop-filter: blur(16px);
+            margin-bottom: 60px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .input-group input,
+        .input-group select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--surface-border);
+            color: var(--text-primary);
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: rgba(155, 81, 224, 0.6);
+            box-shadow: 0 0 0 2px rgba(155, 81, 224, 0.2);
+        }
+
+        .run-btn {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px var(--accent-glow);
+            flex: 0 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .run-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px var(--accent-glow);
+        }
+
+        .run-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading State */
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 40px 0;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .loader.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #9b51e0;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 15px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Results Table */
+        .results-container {
+            background: var(--surface-card);
+            border: 1px solid var(--surface-border);
+            border-radius: 20px;
+            overflow: hidden;
+            display: none;
+            backdrop-filter: blur(16px);
+            animation: slideUp 0.5s ease;
+        }
+
+        .results-container.active {
+            display: block;
+        }
+
+        .table-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--surface-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .score-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .score-badge.low {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 16px 24px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--surface-border);
+        }
+
+        td {
+            padding: 20px 24px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+        }
+
+        tr:last-child td {
+            border: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-icons a {
+            color: var(--text-secondary);
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+
+        .social-icons a:hover {
+            color: white;
+        }
+
+        .empty-cell {
+            color: #475569;
+            font-style: italic;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-secondary);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: var(--surface-card);
+            border-color: rgba(155, 81, 224, 0.4);
+            color: var(--text-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content>.results-container {
+            display: block;
+            /* always block within active tab content */
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-bolt"></i> MuMax Leads
+        </div>
+        <div style="display: flex; gap: 16px;">
+            <a href="/api/download" class="export-btn" id="dlBtn" style="display:none;">
+                <i class="fa-solid fa-file-csv"></i> Download CSV
+            </a>
+            <a href="https://docs.google.com/spreadsheets/u/0/create" target="_blank" class="export-btn primary">
+                <i class="fa-solid fa-table"></i> Open Google Sheets
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="hero-section">
+            <h1>Automated Lead Discovery</h1>
+            <p class="subtitle">Enter a query to scrape Google My Business profiles, automatically visit websites to
+                extract emails & social links, and score the leads intelligently.</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="input-group" style="flex: 2;">
+                <label for="query">Search Query</label>
+                <input type="text" id="query" placeholder="e.g. 'plumbers in los angeles', 'landscapers miami'"
+                    value="plumbers in los angeles">
+            </div>
+            <div class="input-group">
+                <label for="limit">Max Results</label>
+                <select id="limit">
+                    <option value="5">5 Leads</option>
+                    <option value="10" selected>10 Leads</option>
+                    <option value="50">50 Leads</option>
+                    <option value="100">100 Leads</option>
+                    <option value="500">500 Leads</option>
+                    <option value="1000">1000 Leads (Max)</option>
+                </select>
+            </div>
+            <button class="run-btn" id="runBtn" onclick="runScraper()">
+                <i class="fa-solid fa-play" style="margin-right: 8px;"></i> Generate Leads
+            </button>
+        </div>
+
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loaderText">Initializing browser engine...</div>
+        </div>
+
+        <div class="tabs" id="mainTabs" style="display: none;">
+            <button class="tab-btn active" id="tabResults" onclick="switchTab('results')">Current Results</button>
+            <button class="tab-btn" id="tabHistory" onclick="switchTab('history')">History</button>
+        </div>
+
+        <div id="resultsContent" class="tab-content active">
+            <div class="results-container" id="resultsCard" style="display:none;">
+                <div class="table-header">
+                    <h3 id="topResultTitle">Latest Exported Leads</h3>
+                    <span style="color: var(--text-secondary); font-size: 14px;" id="resultCount">0 Leads Scored</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>Business Details</th>
+                                <th>Contact</th>
+                                <th>Socials</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Instantiated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="historyContent" class="tab-content">
+            <div class="results-container" style="display:block;">
+                <div class="table-header">
+                    <h3>Previous Runs</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Search Query</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Instantiated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Check if there are already results on load
+        window.addEventListener('load', fetchResults);
+
+        async function runScraper() {
+            const query = document.getElementById('query').value;
+            const limit = document.getElementById('limit').value;
+
+            if (!query) return alert("Please enter a query.");
+
+            const runBtn = document.getElementById('runBtn');
+            const loader = document.getElementById('loader');
+            const resultsCard = document.getElementById('resultsCard');
+            const loaderText = document.getElementById('loaderText');
+            const dlBtn = document.getElementById('dlBtn');
+
+            // UI State change
+            runBtn.disabled = true;
+            runBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i> Running...';
+            resultsCard.classList.remove('active');
+            dlBtn.style.display = 'none';
+            loader.classList.add('active');
+            loaderText.innerText = "Initializing engine...";
+
+            try {
+                // Kick off the backend pipeline (Returns immediately)
+                const res = await fetch('/api/scrape', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query, limit: parseInt(limit) })
+                });
+
+                const data = await res.json();
+                if (data.status === 'error') throw new Error(data.message);
+
+                // Polling for status
+                const pollInterval = setInterval(async () => {
+                    try {
+                        const statusRes = await fetch('/api/status');
+                        const status = await statusRes.json();
+
+                        if (status.current_step === 'completed') {
+                            clearInterval(pollInterval);
+                            loader.classList.remove('active');
+                            runBtn.disabled = false;
+                            runBtn.innerHTML = '<i class="fa-solid fa-play" style="margin-right: 8px;"></i> Generate Leads';
+                            await fetchResults();
+                        } else if (status.current_step === 'failed') {
+                            clearInterval(pollInterval);
+                            loader.classList.remove('active');
+                            runBtn.disabled = false;
+                            runBtn.innerHTML = '<i class="fa-solid fa-play" style="margin-right: 8px;"></i> Generate Leads';
+                            alert(`Error in engine: ${status.error}`);
+                        } else {
+                            loaderText.innerText = status.current_step;
+                        }
+                    } catch (pollErr) {
+                        console.error("Polling error:", pollErr);
+                    }
+                }, 2000);
+
+            } catch (err) {
+                alert(`Error: ${err.message}`);
+                loader.classList.remove('active');
+                runBtn.disabled = false;
+                runBtn.innerHTML = '<i class="fa-solid fa-play" style="margin-right: 8px;"></i> Generate Leads';
+            }
+        }
+
+        async function fetchResults() {
+            try {
+                const res = await fetch('/api/results');
+                const json = await res.json();
+
+                if (json.data && json.data.length > 0) {
+                    renderTable(json.data);
+                    document.getElementById('topResultTitle').innerText = "Latest Exported Leads";
+                    document.getElementById('mainTabs').style.display = 'flex';
+                    switchTab('results');
+                    document.getElementById('resultsCard').style.display = 'block';
+                    document.getElementById('dlBtn').style.display = 'inline-flex';
+                    document.getElementById('dlBtn').href = "/api/download";
+                    document.getElementById('resultCount').innerText = `${json.data.length} Leads Scored & Extracted`;
+                } else {
+                    // Check if there is history
+                    const histRes = await fetch('/api/history');
+                    const histJson = await histRes.json();
+                    if (histJson.history && histJson.history.length > 0) {
+                        document.getElementById('mainTabs').style.display = 'flex';
+                        switchTab('history');
+                    }
+                }
+            } catch (err) {
+                console.error("No past results found or error parsing.", err);
+            }
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tabResults').classList.remove('active');
+            document.getElementById('tabHistory').classList.remove('active');
+            document.getElementById('resultsContent').classList.remove('active');
+            document.getElementById('historyContent').classList.remove('active');
+
+            if (tab === 'results') {
+                document.getElementById('tabResults').classList.add('active');
+                document.getElementById('resultsContent').classList.add('active');
+            } else {
+                document.getElementById('tabHistory').classList.add('active');
+                document.getElementById('historyContent').classList.add('active');
+                fetchHistory(); // refresh history
+            }
+        }
+
+        async function fetchHistory() {
+            try {
+                const res = await fetch('/api/history');
+                const json = await res.json();
+                const tbody = document.getElementById('historyTableBody');
+                tbody.innerHTML = '';
+
+                if (!json.history || json.history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3"><span class="empty-cell">No history found.</span></td></tr>';
+                    return;
+                }
+
+                json.history.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="color:var(--text-secondary);">${item.date}</td>
+                        <td style="font-weight: 600; color:white; text-transform:capitalize;">${item.query}</td>
+                        <td>
+                            <button onclick="loadHistoryFile('${item.filename}', '${item.query}')" class="export-btn" style="padding: 6px 12px; font-size: 13px; text-transform:none;">View Results</button>
+                            <a href="/api/download?file=${item.filename}" class="export-btn" style="padding: 6px 12px; font-size: 13px; margin-left: 8px;"><i class="fa-solid fa-download"></i></a>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Failed to fetch history.", err);
+            }
+        }
+
+        async function loadHistoryFile(filename, query) {
+            try {
+                const res = await fetch(`/api/results?file=${filename}`);
+                const json = await res.json();
+                if (json.data && json.data.length > 0) {
+                    renderTable(json.data);
+                    document.getElementById('topResultTitle').innerText = `Results: ${query}`;
+                    switchTab('results');
+                    document.getElementById('resultsCard').style.display = 'block';
+                    document.getElementById('dlBtn').style.display = 'inline-flex';
+                    document.getElementById('dlBtn').href = `/api/download?file=${filename}`;
+                    document.getElementById('resultCount').innerText = `${json.data.length} Leads Scored & Extracted`;
+                }
+            } catch (err) {
+                alert("Could not load history file: " + err.message);
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(row => {
+                // Name & Website column
+                const websiteLink = row.Website ? `<a href="${row.Website}" target="_blank" style="color: #4a90e2;text-decoration:none;font-size:13px;">${new URL(row.Website).hostname}</a>` : '<span class="empty-cell">No website</span>';
+                const htmlCol1 = `
+                    <div style="font-weight:600; color:white; margin-bottom:4px; max-width:250px;">${row.Name}</div>
+                    ${websiteLink}
+                `;
+
+                // Contact (Phone / Email)
+                const rawPhone = row.Phone;
+                let phoneHTML = '<span class="empty-cell">N/A</span>';
+                if (rawPhone && rawPhone.trim() !== "") {
+                    // Extract just the digits (and plus block) for tel: link
+                    const cleanPhone = rawPhone.replace(/[^\d+]/g, '');
+                    phoneHTML = `<a href="tel:${cleanPhone}" style="color:var(--text-secondary); text-decoration:none; transition: color 0.1s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='var(--text-secondary)'">${rawPhone}</a>`;
+                }
+
+                const emailHref = row.Email ? row.Email.split(',')[0].trim() : '';
+                const emailHTML = row.Email ? `<a href="mailto:${emailHref}" style="color:var(--text-secondary); text-decoration:none; transition: color 0.1s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='var(--text-secondary)'">${emailHref}</a>` : '<span class="empty-cell">N/A</span>';
+
+                const htmlCol2 = `
+                    <div style="margin-bottom:6px;"><i class="fa-solid fa-phone" style="color:var(--text-secondary);font-size:12px;margin-right:6px;width:14px;text-align:center;"></i> ${phoneHTML}</div>
+                    <div><i class="fa-solid fa-envelope" style="color:var(--text-secondary);font-size:12px;margin-right:6px;width:14px;text-align:center;"></i> ${emailHTML}</div>
+                `;
+
+                // Social Icons
+                let socialsHTML = '<div class="social-icons">';
+                if (row.Facebook) socialsHTML += `<a href="${row.Facebook}" target="_blank" title="Facebook"><i class="fa-brands fa-facebook"></i></a>`;
+                if (row.Instagram) socialsHTML += `<a href="${row.Instagram}" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>`;
+                if (row.LinkedIn) socialsHTML += `<a href="${row.LinkedIn}" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>`;
+                if (row['X (Twitter)']) socialsHTML += `<a href="${row['X (Twitter)']}" target="_blank" title="X"><i class="fa-brands fa-x-twitter"></i></a>`;
+                if (row.TikTok) socialsHTML += `<a href="${row.TikTok}" target="_blank" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>`;
+                if (row.YouTube) socialsHTML += `<a href="${row.YouTube}" target="_blank" title="YouTube"><i class="fa-brands fa-youtube"></i></a>`;
+                if (socialsHTML === '<div class="social-icons">') socialsHTML = '<span class="empty-cell">No socials found</span>';
+                else socialsHTML += "</div>";
+
+                // Score Badge
+                const rawScore = parseInt(row.Score.split('/')[0]);
+                const badgeClass = rawScore >= 4 ? 'score-badge' : 'score-badge low';
+                const scoreHTML = `<span class="${badgeClass}">${row.Score} Points</span>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${htmlCol1}</td>
+                    <td>${htmlCol2}</td>
+                    <td>${socialsHTML}</td>
+                    <td>${scoreHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+
+</html>
